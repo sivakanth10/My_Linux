@@ -1,0 +1,50 @@
+ under Linux. It is installed by default. This how-to covers generating and using ssh keys for automated usage such as:
+
+
+ 
+Automated Login using the shell scripts.
+Making backups.
+Run commands from the shell prompt etc.
+
+
+Task: Generating SSH Keys
+
+First, log on to your workstation ( for example log on to workstation called admin.fbsd.nixcraft.org as vivek user). Please refer the following sample setup – You will be log in, on your local system, AS THE USER you wish to make passwordless ssh connections.
+
+Fig.01 ssh key based authentication
+ssh key based authentication
+Create the cryptographic Key on FreeBSD / Linux / UNIX workstation, enter:
+ssh-keygen -t rsa
+
+Assign the pass phrase (press [enter] key twice if you don’t want a passphrase). It will create 2 files in ~/.ssh directory as follows:
+
+~/.ssh/id_rsa : identification (private) key
+~/.ssh/id_rsa.pub : public key
+Use scp to copy the id_rsa.pub (public key) to rh9linux.nixcraft.org server as authorized_keys2 file, this is know as Installing the public key to server.
+scp .ssh/id_rsa.pub vivek@rh9linux.nixcraft.org:.ssh/authorized_keys2
+
+From FreeBSD workstation login to server:
+ssh rh9linux.nixcraft.org
+
+Changing the pass-phrase on workstation (if needed):
+ssh-keygen -p
+
+Use of ssh-agent to avoid continues pass-phrase typing
+At freebsd workstation type:
+ssh-agent $BASH
+ssh-add
+
+Type your pass-phrase
+
+Now ssh server will not use prompt for the password. Above two commands can be added to your ~/.bash_profile file so that as soon as you login into workstation you can set the agent.
+
+Deleting the keys hold by ssh-agent
+
+To list keys, enter:
+ssh-add -l
+
+To delete all keys, enter:
+ssh-add -D
+
+To delete specific key, enter:
+ssh-add -d key
