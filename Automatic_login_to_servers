@@ -1,0 +1,27 @@
+#Automatically run commands over SSH on many servers
+#to login to multiple servers those are in hosts.txt file
+
+for host in $(cat hosts.txt); do ssh "$host" "$command" >"output.$host"; done
+Authenticating with name/password is really no good idea. You should set up a private key for this:
+
+ssh-keygen && for host in $(cat hosts.txt); do ssh-copy-id $host; done
+
+
+or
+
+
+
+Assuming that you are not able to get pssh or others installed, you could do something similar to:
+
+tmpdir=${TMPDIR:-/tmp}/pssh.$$
+mkdir -p $tmpdir
+count=0
+while IFS= read -r userhost; do
+    ssh -n -o BatchMode=yes ${userhost} 'uname -a' > ${tmpdir}/${userhost} 2>&1 &
+    count=`expr $count + 1`
+done < userhost.lst
+while [ $count -gt 0 ]; do
+    wait $pids
+    count=`expr $count - 1`
+done
+echo "Output for hosts are in $tmpdir"
